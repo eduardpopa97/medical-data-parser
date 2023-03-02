@@ -1,0 +1,36 @@
+package guiJUnitTests;
+
+import java.io.File;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import gui.Parser;
+
+public class LoadFilesTests {
+
+	private static Parser parser = new Parser();
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void XMLFileLoadingTest()
+	{
+		parser.chooser.setSelectedFile(new File(z));
+		parser.btnBrowseXML.doClick();
+		Assert.assertTrue(new File("D:\\facultate\\Anul 5\\"
+				+ "testare software si asigurarea calitatii\\sistem medical junit"
+				+ "\\sistem medical\\sistem_expert.xml").exists());
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void JSONFileLoadingTest()
+	{
+		parser.chooser.setSelectedFile(new File("D:\\facultate\\Anul 5\\"
+				+ "testare software si asigurarea calitatii\\sistem_expert.json"));
+		parser.btnBrowseJSON.doClick();
+		Assert.assertTrue(new File("D:\\facultate\\Anul 5\\"
+				+ "testare software si asigurarea calitatii\\sistem medical junit"
+				+ "\\sistem medical\\sistem_expert.json").exists());
+	}
+}

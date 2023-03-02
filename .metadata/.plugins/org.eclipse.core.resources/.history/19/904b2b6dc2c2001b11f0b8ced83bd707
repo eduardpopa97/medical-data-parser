@@ -1,0 +1,761 @@
+package gui;
+
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.awt.Color;
+import java.awt.Desktop;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.awt.event.ActionEvent;
+import javax.swing.JTable;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+
+public class Parser{
+
+	public JFrame frame;
+	
+	public static JTable table;
+	
+	private JScrollPane scrollPane;
+	
+	public static JTextField donorsForPacientField;
+	
+	public static JButton btnDisplayPacientsList = new JButton("<html>Lista pacienti</html>");
+	
+	public static JButton btnDisplayDoctorsList = new JButton("Lista medici");
+	
+	public static JButton btnDisplayDonorsList = new JButton("Lista donatori");
+	
+	public static JButton btnOpenUpdateXMLFrame = new JButton("<html><center>Adaugare pacienti in <br>documentele XML si JSON</center></html>");
+	
+	public static JButton btnBrowseXML = new JButton("<html>Incarcati documentul <br><center>XML</center><html>");
+	
+	public static JButton btnBrowseJSON = new JButton("<html>Incarcati documentul<br><center> JSON</center></html>");
+	
+	public static JButton btnGetDiagnostics = new JButton("<html>Identificare diagnostic <br><center>pacienti</center></html>");
+	
+	public static JButton btnSearchDonors = new JButton("<html>Cauta donatori<br><center>compatibili</center></html>");
+	
+	public static JButton btnTransfusionsRules = new JButton("Reguli transfuzii");
+	
+	public static JFileChooser chooser = new JFileChooser();
+	
+	public static DefaultTableModel model = new DefaultTableModel();
+	
+	
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Parser window = new Parser();
+					window.frame.setVisible(true);  
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+
+	/**
+	 * Create the application.
+	 */
+	public Parser() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 908, 433);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(405, 64, 457, 306);
+		frame.getContentPane().add(scrollPane);
+		
+		table = new JTable();
+		scrollPane.setViewportView(table);
+		table.setBackground(Color.WHITE);
+		
+		JLabel lblSistemExpertMedical = new JLabel("<html>Sistem de diagnosticare a pacientilor si de verificare a compatibilitatii in cadrul transfuziilor de sange</html>");
+		lblSistemExpertMedical.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+		lblSistemExpertMedical.setBounds(56, 11, 790, 42);
+		frame.getContentPane().add(lblSistemExpertMedical);
+		
+
+		btnDisplayPacientsList.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnDisplayPacientsList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = {"Nume","Simptome","Grupa sange","Tip RH"};
+				model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[4];												
+				
+				try {
+
+					File xmlDoc = new File("sistem_expert.xml");                               
+					DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();		
+					DocumentBuilder dBuild = dbFact.newDocumentBuilder();					     
+					Document doc = dBuild.parse(xmlDoc);										
+					
+					NodeList nList = doc.getElementsByTagName("persoana");					
+					
+					for(int i=0; i<nList.getLength();i++)										
+					{
+						Node nNode = nList.item(i);	
+						if(nNode.getNodeType() == Node.ELEMENT_NODE)
+						{
+							Element eElement = (Element) nNode;
+							for(int j=0;j<eElement.getElementsByTagName("simptom").getLength();j++) 										
+							{	
+								if(eElement.getElementsByTagName("simptom").item(j)!=null) {		
+								row[0] = eElement.getElementsByTagName("nume").item(0).getTextContent();
+								row[1] = eElement.getElementsByTagName("simptom").item(j).getTextContent();
+								row[2] = eElement.getElementsByTagName("grupa_sange").item(0).getTextContent();
+								row[3] = eElement.getElementsByTagName("rh").item(0).getTextContent();
+								model.addRow(row);													
+								}
+							}
+		
+						}
+					}
+					
+				}	
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+				
+		});
+		btnDisplayPacientsList.setBounds(10, 109, 168, 23);
+		frame.getContentPane().add(btnDisplayPacientsList);
+		
+
+		btnDisplayDoctorsList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = {"Nume medic","Specializare"};
+				model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[2];                                                 
+				
+				try {
+
+					File xmlDoc = new File("sistem_expert.xml");							   
+					DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();	   
+					DocumentBuilder dBuild = dbFact.newDocumentBuilder();					   
+					Document doc = dBuild.parse(xmlDoc);									
+					
+					NodeList nList = doc.getElementsByTagName("medic");						 
+					
+					for(int i=0; i<nList.getLength();i++)                                   
+					{
+						Node nNode = nList.item(i);
+						if(nNode.getNodeType() == Node.ELEMENT_NODE)
+						{
+							Element eElement = (Element) nNode;
+						    row[0] = eElement.getElementsByTagName("nume").item(0).getTextContent();
+							row[1] = eElement.getElementsByTagName("specializare").item(0).getTextContent();
+							model.addRow(row);												 
+								
+							}
+		
+						}
+					
+				}	
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+		
+		});
+		btnDisplayDoctorsList.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnDisplayDoctorsList.setBounds(10, 143, 168, 23);
+		frame.getContentPane().add(btnDisplayDoctorsList);
+		
+
+		btnDisplayDonorsList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = {"Nume donator","Grupa sange","Tip RH"};
+				DefaultTableModel model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[3];													
+				
+				try {
+
+					File xmlDoc = new File("sistem_expert.xml");								
+					DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();		
+					DocumentBuilder dBuild = dbFact.newDocumentBuilder();						
+					Document doc = dBuild.parse(xmlDoc);										
+					
+					NodeList nList = doc.getElementsByTagName("persoana");						
+					
+					for(int i=0; i<nList.getLength();i++)
+					{
+						Node nNode = nList.item(i);
+						if(nNode.getNodeType() == Node.ELEMENT_NODE)
+						{
+							Element eElement = (Element) nNode;
+							Element nameTag = (Element) eElement.getElementsByTagName("nume").item(0);		
+							if(nameTag.getAttribute("donator").toString().equals("da"))						
+							{
+								if(eElement.getElementsByTagName("nume").item(0)!=null) row[0] = eElement.getElementsByTagName("nume").item(0).getTextContent();
+								if(eElement.getElementsByTagName("grupa_sange").item(0)!=null) row[1] = eElement.getElementsByTagName("grupa_sange").item(0).getTextContent();
+								if(eElement.getElementsByTagName("rh").item(0)!=null) row[2] = eElement.getElementsByTagName("rh").item(0).getTextContent();
+								model.addRow(row);															
+							}
+						}
+		
+					}
+					
+				}	
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			
+			}
+		});
+		btnDisplayDonorsList.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnDisplayDonorsList.setBounds(10, 177, 168, 23);
+		frame.getContentPane().add(btnDisplayDonorsList);
+		
+
+		btnGetDiagnostics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = { "Nume", "Diagnostic" };
+				DefaultTableModel model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[2];																
+				Object diagnostic = null;
+
+				try {
+
+					File xmlDoc = new File("sistem_expert.xml");											
+					DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();					
+					DocumentBuilder dBuild = dbFact.newDocumentBuilder();								
+					Document doc = dBuild.parse(xmlDoc);													
+
+					NodeList nList = doc.getElementsByTagName("persoana");									
+					NodeList sList = doc.getElementsByTagName("if");										
+					NodeList tList = doc.getElementsByTagName("then");										
+					Object[] simpt = new Object[10];														
+
+					int nr = 0;																				
+					int counter = -1;																		
+					int pos = 0;																			
+
+					for (int i = 0; i < nList.getLength(); i++) {										
+						Node nNode = nList.item(i);
+						if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+							Element eElement = (Element) nNode;
+							Element nameTag = (Element) eElement.getElementsByTagName("nume").item(0);		
+							if(nameTag.getAttribute("donator").toString().equals("nu"))						
+							{
+								for (int j = 0; j < 10; j++) {
+									if (eElement.getElementsByTagName("simptom").item(j) != null)
+										counter++;															
+								}
+
+								for (int j = 0; j <= counter; j++) {
+									if (eElement.getElementsByTagName("simptom").item(j) != null) {			
+										simpt[j] = eElement.getElementsByTagName("simptom").item(j).getTextContent();    
+										
+									}
+								}
+
+								for (int j = 0; j < sList.getLength(); j++) {							
+									Node sNode = sList.item(j);
+										
+									if (sNode.getNodeType() == Node.ELEMENT_NODE) {
+										Element sElement = (Element) sNode;
+										
+										if (counter + 1 == sElement.getElementsByTagName("simptom").getLength()) {		
+					
+											for (int k = 0; k <= counter; k++) {
+
+												for (int m = 0; m < sElement.getElementsByTagName("simptom").getLength(); m++) {
+												
+													if (sElement.getElementsByTagName("simptom").item(m).getTextContent().toString().equals(simpt[k].toString()) == true)
+														nr++;															
+													if (nr == counter) pos = j;											
+											
+
+												}
+											}
+										}
+									}
+								}
+	
+									Node tNode = tList.item(pos);														
+									if (tNode.getNodeType() == Node.ELEMENT_NODE) {
+									
+										Element tElement = (Element) tNode;
+
+										diagnostic = tElement.getElementsByTagName("boala").item(0).getTextContent();	
+										row[0] = eElement.getElementsByTagName("nume").item(0).getTextContent();		
+										row[1] = diagnostic;															
+										model.addRow(row);																
+									}
+
+									counter = -1;																		
+									nr = 0;
+								}
+							}
+						}
+					}
+
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+		});
+		btnGetDiagnostics.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnGetDiagnostics.setBounds(10, 211, 168, 37);
+		frame.getContentPane().add(btnGetDiagnostics);
+		
+		JLabel lblAflatiDonatoriCompatibili = new JLabel("<html>Aflati donatorii compatibili pentru un pacient<html>");
+		lblAflatiDonatoriCompatibili.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblAflatiDonatoriCompatibili.setBounds(10, 259, 175, 30);
+		frame.getContentPane().add(lblAflatiDonatoriCompatibili);
+		
+		donorsForPacientField = new JTextField();
+		donorsForPacientField.setBounds(32, 300, 126, 20);
+		frame.getContentPane().add(donorsForPacientField);
+		donorsForPacientField.setColumns(10);
+		
+
+		btnSearchDonors.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Object[] columns = {"Nume donator", "Grupa sanguina donator", "Tip RH"};
+				DefaultTableModel model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[3];												 
+				
+				try {
+
+					File xmlDoc = new File("sistem_expert.xml");							
+					DocumentBuilderFactory dbFact = DocumentBuilderFactory.newInstance();	
+					DocumentBuilder dBuild = dbFact.newDocumentBuilder();					
+					Document doc = dBuild.parse(xmlDoc);									
+					int pos = -1;															
+					String grupa_sanguina = null;											
+					String tip_rh = null;													
+					String[] vect_comp = new String[4];										
+					int nr_grupe = -1;														
+					boolean stare_transfuzie = false;										
+					
+					String name = donorsForPacientField.getText();										
+					
+					NodeList nList = doc.getElementsByTagName("persoana");					
+					
+					for(int i=0; i<nList.getLength();i++)									
+					{
+						Node nNode = nList.item(i);
+						if(nNode.getNodeType() == Node.ELEMENT_NODE)
+						{
+							Element eElement = (Element) nNode;
+							if(name.equals(eElement.getElementsByTagName("nume").item(0).getTextContent().toString()))		
+							{
+								NodeList childList = doc.getElementsByTagName("nume");
+								Node child = childList.item(i);
+								Element tag = (Element) child;																
+								if(tag.getAttribute("nevoie_transfuzie").toString().equals("nu")) stare_transfuzie = true;  
+								pos = i;																					
+								grupa_sanguina = eElement.getElementsByTagName("grupa_sange").item(0).getTextContent().toString();		
+								tip_rh =  eElement.getElementsByTagName("rh").item(0).getTextContent().toString();						
+							}		
+						}
+					}
+
+					if(pos<0) JOptionPane.showMessageDialog(null, "Persoana cautata nu a fost gasita in documentul XML","Atentie", JOptionPane.YES_NO_OPTION);     
+					else                                                                            
+					{
+						NodeList dList = doc.getElementsByTagName("donare");						
+						for(int j=0; j<dList.getLength();j++)										
+						{
+							Node dNode = dList.item(j);
+							if(dNode.getNodeType() == Node.ELEMENT_NODE)
+							{
+								Element dElement = (Element) dNode;
+								if (dElement.getElementsByTagName("primitor").item(0).getTextContent().toString().equals(grupa_sanguina))    
+								{
+									nr_grupe++;																							     
+									vect_comp[nr_grupe] = dElement.getElementsByTagName("donator").item(0).getTextContent().toString();		 
+								}
+									
+							}
+						}
+					}
+					
+						
+					NodeList bList = doc.getElementsByTagName("persoana");				
+					for(int i=0; i<bList.getLength(); i++)
+					{
+						Node bNode = bList.item(i);
+						if(bNode.getNodeType() == Node.ELEMENT_NODE)
+						{
+							Element bElement = (Element) bNode;
+							Element nameTag = (Element) bElement.getElementsByTagName("nume").item(0);
+							if(nameTag.getAttribute("donator").toString().equals("da"))				
+							{
+								for(int j=0; j<=nr_grupe; j++)
+								{
+									if(bElement.getElementsByTagName("grupa_sange").item(0).getTextContent().equals(vect_comp[j]) && bElement.getElementsByTagName("rh").item(0).getTextContent().equals(tip_rh))	 // se verifica daca grupa de sange a persoanei se gaseste in vectorul ce contine grupele de sange compatibile cu cea a primitorului si daca donatorul si primitorul au acelasi rh				
+									{
+										row[0] = bElement.getElementsByTagName("nume").item(0).getTextContent();
+										row[1] = bElement.getElementsByTagName("grupa_sange").item(0).getTextContent();
+										row[2] = bElement.getElementsByTagName("rh").item(0).getTextContent();
+										model.addRow(row);											
+									}
+								}
+							}
+						}
+					}
+					if(stare_transfuzie == true) JOptionPane.showMessageDialog(null, "Persoana cautata a fost gasita in documentul XML, dar nu are nevoie de o transfuzie de sange","Notificare", JOptionPane.OK_CANCEL_OPTION);  
+				}
+			
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+			
+
+			}
+				
+		});
+		btnSearchDonors.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnSearchDonors.setBounds(10, 331, 168, 39);
+		frame.getContentPane().add(btnSearchDonors);
+		
+
+		btnBrowseXML.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String destinationpath = System.getProperty("sistem_expert.xml");  
+				System.out.println(destinationpath);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("XML file", "xml");	
+				if(chooser.getSelectedFile() == null)
+				{
+					chooser.setFileFilter(filter);
+					int returnVal = chooser.showOpenDialog(null);
+					if(returnVal == JFileChooser.APPROVE_OPTION) {
+						JOptionPane.showMessageDialog(null, "Ati ales sa adaugati fisierul " + chooser.getSelectedFile().getName() ,"Notificare", JOptionPane.OK_CANCEL_OPTION);    
+				    }
+				}
+				if(chooser.getSelectedFile() != null)
+				{
+					String sourcepath = chooser.getSelectedFile().getAbsolutePath();    
+					BufferedReader reader = null;
+					try 
+					{
+						reader = new BufferedReader(new FileReader(sourcepath));		 
+					} 
+					catch (FileNotFoundException e) 
+					{
+						e.printStackTrace();
+					}
+					BufferedWriter writer = null;
+					try 
+					{
+						writer = new BufferedWriter(new FileWriter(destinationpath));   
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+			    
+					String line = null;
+
+					try 
+					{
+						while ((line = reader.readLine()) != null)
+						{
+							writer.write(line);			
+						}
+					} 
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					try 
+					{
+						reader.close();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+					
+					try
+					{
+						writer.close();
+					} 
+					catch (IOException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		
+		btnBrowseXML.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnBrowseXML.setBounds(10, 61, 168, 37);
+		frame.getContentPane().add(btnBrowseXML);
+		
+
+		btnBrowseJSON.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnBrowseJSON.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String destinationpath = "D:\\facultate\\Anul 5\\testare software si asigurarea calitatii\\sistem medical junit\\sistem medical\\sistem_expert.json";      			
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON file", "json");  
+				if(chooser.getSelectedFile() == null)
+				{
+					chooser.setFileFilter(filter); 
+					int returnVal = chooser.showOpenDialog(null);
+					if(returnVal == JFileChooser.APPROVE_OPTION) {
+						JOptionPane.showMessageDialog(null, "Ati ales sa adaugati fisierul " + chooser.getSelectedFile().getName() ,"Notificare", JOptionPane.OK_CANCEL_OPTION);     
+				    }
+				}
+				if(chooser.getSelectedFile() != null)
+				{
+				String sourcepath = chooser.getSelectedFile().getAbsolutePath();   
+				BufferedReader reader = null;
+				try {
+					reader = new BufferedReader(new FileReader(sourcepath));     
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			    BufferedWriter writer = null;
+				try {
+					writer = new BufferedWriter(new FileWriter(destinationpath));   
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			    
+			    String line = null;
+
+		        try {
+					while ((line = reader.readLine()) != null)
+					{
+					    writer.write(line);				
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+		        try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		        try {
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				}
+			}
+		});
+		btnBrowseJSON.setBounds(194, 61, 168, 37);
+		frame.getContentPane().add(btnBrowseJSON);
+		
+		JButton btnDiagnosticRules = new JButton("<html>Reguli de diagnosticare</html>");
+		btnDiagnosticRules.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = {"Diagnostic", "Simptom"};
+				DefaultTableModel model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[2];
+		
+				
+				JSONParser parser = new JSONParser();                            
+				try
+				{
+					Object obj = parser.parse(new FileReader("D:\\facultate\\Anul 5\\"
+							+ "testare software si asigurarea calitatii\\sistem medical junit\\"
+							+ "sistem medical\\sistem_expert.json")); 
+					JSONObject jsonObject = (JSONObject) obj;	
+					JSONObject medicalList = (JSONObject) jsonObject.get("sistem_medical");
+					
+					JSONObject rules = (JSONObject)medicalList.get("reguli");			
+					JSONArray rule = (JSONArray)rules.get("regula");					
+					
+					@SuppressWarnings("unchecked")
+					Iterator<JSONObject> symptoms = (Iterator<JSONObject>)rule.listIterator();		
+					while(symptoms.hasNext())		
+					{
+						JSONObject item = (JSONObject)symptoms.next();   
+						JSONObject condition = (JSONObject)item.get("if");		
+						JSONObject diagnostic = (JSONObject)item.get("then");	
+					
+						String disease = (String)diagnostic.get("boala");  
+						row[0]=disease;                                    
+
+						JSONArray symptom = (JSONArray) condition.get("simptom");   
+						@SuppressWarnings("unchecked")
+						Iterator<JSONObject> signs = (Iterator<JSONObject>)symptom.listIterator();   
+						while(signs.hasNext())
+						{
+							row[1] = signs.next();
+							model.addRow(row);  
+							row[0]="";     
+						}
+					}
+		
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+		btnDiagnosticRules.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnDiagnosticRules.setBounds(194, 109, 168, 23);
+		frame.getContentPane().add(btnDiagnosticRules);
+		
+
+		btnTransfusionsRules.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Object[] columns = {"Grupa sange donator", "Grupa sange primitor"};
+				DefaultTableModel model = new DefaultTableModel();
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(30);
+				Object[] row = new Object[2];
+		
+				JSONParser parser = new JSONParser();                             
+				
+				try
+				{
+					Object obj = parser.parse(new FileReader("D:\\facultate\\Anul 5\\"
+							+ "testare software si asigurarea calitatii\\sistem medical junit\\"
+							+ "sistem medical\\sistem_expert.json"));   
+					JSONObject jsonObject = (JSONObject) obj;
+					JSONObject medicalList = (JSONObject) jsonObject.get("sistem_medical");
+					
+					JSONObject match = (JSONObject)medicalList.get("compatibilitate");        
+					JSONArray seek = (JSONArray)match.get("donare");						
+					
+					@SuppressWarnings("unchecked")
+					Iterator<JSONObject> search = (Iterator<JSONObject>)seek.listIterator();     
+					
+					while(search.hasNext())              
+					{
+						JSONObject item = search.next();
+						row[0] = item.get("donator");	
+						row[1] = item.get("primitor");
+						model.addRow(row);               
+					}
+
+	
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		btnTransfusionsRules.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnTransfusionsRules.setBounds(194, 143, 168, 23);
+		frame.getContentPane().add(btnTransfusionsRules);
+		
+		JButton btnDisplayXMLWithStyleSheet = new JButton("<html>Afisare fisier XML cu <br><center>foi de stiluri</center></html>");
+		btnDisplayXMLWithStyleSheet.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try
+				{
+					String URL = "D:\\facultate\\Anul 5\\testare software si asigurarea calitatii\\"
+							+ "sistem medical junit\\sistem medical\\sistem_expert.xml"; 
+					File htmlFile = new File(URL);
+	                Desktop.getDesktop().browse(htmlFile.toURI());
+				} 
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		btnDisplayXMLWithStyleSheet.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnDisplayXMLWithStyleSheet.setBounds(194, 177, 168, 42);
+		frame.getContentPane().add(btnDisplayXMLWithStyleSheet);
+		
+
+		btnOpenUpdateXMLFrame.addActionListener(new ActionListener() {
+			@SuppressWarnings("static-access")
+			public void actionPerformed(ActionEvent arg0) {
+				UpdateFilesFrame updateframe = new UpdateFilesFrame();
+				updateframe.frame.setVisible(true);
+			}
+		});
+		btnOpenUpdateXMLFrame.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnOpenUpdateXMLFrame.setBounds(194, 230, 168, 59);
+		frame.getContentPane().add(btnOpenUpdateXMLFrame);
+	}
+}
+	
+
+

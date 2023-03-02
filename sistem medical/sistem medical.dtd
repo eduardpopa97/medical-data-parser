@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT sistem_medical (pacienti,compatibilitate,medici,boli,reguli)>
+<!ELEMENT pacienti (persoana+)>
+<!ELEMENT persoana (nume,simptom*,grupa_sange,rh)>
+<!ATTLIST nume nevoie_transfuzie CDATA #REQUIRED>
+<!ATTLIST nume donator CDATA #REQUIRED>
+<!ELEMENT simptom (#PCDATA)>
+<!ELEMENT grupa_sange (#PCDATA)>
+<!ELEMENT rh (#PCDATA)>
+<!ELEMENT compatibilitate (donare+)>
+<!ELEMENT donare (donator,primitor)>
+<!ELEMENT donator (#PCDATA)>
+<!ELEMENT primitor (#PCDATA)>
+<!ELEMENT medici (medic+)>
+<!ELEMENT medic (nume,specializare)>
+<!ELEMENT specializare (#PCDATA)>
+<!ELEMENT boli (afectiune+)>
+<!ELEMENT afectiune (nume,specializare)>
+<!ELEMENT reguli (regula)>
+<!ELEMENT regula (if,then)>
+<!ELEMENT if (simptom+)>
+<!ELEMENT then (boala)>
+<!ELEMENT boala (#PCDATA)>

@@ -1,0 +1,329 @@
+package gui;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.XML;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+
+public class UpdateFilesFrame{
+
+	public static JFrame frame;
+	
+	public static JTextField pacientNameField;
+	
+	public static JTable table;
+	
+	public static JTextField newSymptomField;
+	
+	public static DefaultTableModel model = new DefaultTableModel();
+	
+	public static JComboBox<String> needBloodTransfusions = new JComboBox<String>();
+	
+	public static JComboBox<String> isDonor = new JComboBox<String>();
+	
+	public static JComboBox<String> bloodGroup = new JComboBox<String>();
+	
+	public static JComboBox<String> rhType = new JComboBox<String>();
+	
+	public static JButton btnAddSymptom = new JButton("Adaugare simptom");
+	
+	public static JButton btnDeleteSymptom = new JButton("Stergere simptom");
+	
+	public static JButton btnNewPacient = new JButton("<html><center>Adaugare pacient <br>in documentul XML</center><html>");
+	
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			@SuppressWarnings("static-access")
+			public void run() {
+				try {
+					UpdateFilesFrame window = new UpdateFilesFrame();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+
+	/**
+	 * Create the application.
+	 */
+	public UpdateFilesFrame() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 566, 335);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		JLabel lblAdaugarePacient = new JLabel("Adaugare pacient");
+		lblAdaugarePacient.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblAdaugarePacient.setBounds(24, 32, 111, 14);
+		frame.getContentPane().add(lblAdaugarePacient);
+		
+		pacientNameField = new JTextField();
+		pacientNameField.setBounds(24, 87, 86, 20);
+		frame.getContentPane().add(pacientNameField);
+		pacientNameField.setColumns(10);
+		
+		JLabel lblNume = new JLabel("Nume");
+		lblNume.setBounds(24, 67, 46, 14);
+		frame.getContentPane().add(lblNume);
+		
+		JLabel lblDonator = new JLabel("Donator");
+		lblDonator.setBounds(138, 67, 46, 14);
+		frame.getContentPane().add(lblDonator);
+		
+
+		isDonor.addItem("Da");
+		isDonor.addItem("Nu");
+		isDonor.setBounds(135, 87, 72, 20);
+		frame.getContentPane().add(isDonor);
+		
+		JLabel lblNevoieTransfuzie = new JLabel("Nevoie transfuzie");
+		lblNevoieTransfuzie.setBounds(231, 67, 108, 14);
+		frame.getContentPane().add(lblNevoieTransfuzie);
+		
+
+		needBloodTransfusions.setBounds(231, 87, 72, 20);
+		needBloodTransfusions.addItem("Da");
+		needBloodTransfusions.addItem("Nu");
+		frame.getContentPane().add(needBloodTransfusions);
+		
+		
+		btnAddSymptom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+	
+				Object[] columns = {"Simptome pacient"};
+				model.setColumnIdentifiers(columns);
+				table.setModel(model);
+				table.setRowHeight(20);
+				if(!newSymptomField.getText().equals(""))
+				{
+					model.addRow(new Object[] {newSymptomField.getText()});	
+					newSymptomField.setText("");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Nu a fost introdus niciun simptom","Atentie", JOptionPane.YES_NO_OPTION);
+				}
+				
+			}
+		});
+		btnAddSymptom.setBounds(156, 169, 148, 23);
+		frame.getContentPane().add(btnAddSymptom);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(24, 118, 122, 158);
+		frame.getContentPane().add(scrollPane);
+		
+		table = new JTable();
+		scrollPane.setViewportView(table);
+		table.setBackground(Color.WHITE);
+		
+		JLabel lblNewLabel = new JLabel("Scrieti simptomul in caseta de mai jos");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel.setBounds(156, 119, 248, 14);
+		frame.getContentPane().add(lblNewLabel);
+		
+		newSymptomField = new JTextField();
+		newSymptomField.setBounds(155, 138, 148, 20);
+		frame.getContentPane().add(newSymptomField);
+		newSymptomField.setColumns(10);
+		
+		JLabel lblNewLabel_1 = new JLabel("Grupa sanguina");
+		lblNewLabel_1.setBounds(349, 67, 98, 14);
+		frame.getContentPane().add(lblNewLabel_1);
+		
+
+		bloodGroup.setBounds(349, 87, 72, 20);
+		bloodGroup.addItem("O");
+		bloodGroup.addItem("A");
+		bloodGroup.addItem("B");
+		bloodGroup.addItem("AB");
+		frame.getContentPane().add(bloodGroup);
+		
+		JLabel lblRhPacient = new JLabel("RH pacient");
+		lblRhPacient.setBounds(457, 67, 80, 14);
+		frame.getContentPane().add(lblRhPacient);
+		
+
+		rhType.setBounds(457, 87, 72, 20);
+		rhType.addItem("pozitiv");
+		rhType.addItem("negativ");
+		frame.getContentPane().add(rhType);
+		
+
+		btnNewPacient.addActionListener(new ActionListener() {
+			private BufferedReader br;
+
+			public void actionPerformed(ActionEvent e) {
+				
+				 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				 try
+				 {
+					 DocumentBuilder db = dbf.newDocumentBuilder();
+					 Document dom = db.parse(new File(Paths.get("pacientFile.xml").toAbsolutePath().toString()).toString());
+					 Document originaldom = db.parse(new File(Paths.get("sistem_expert.xml").toAbsolutePath().toString()).toString());
+					 
+					 NodeList nList = dom.getElementsByTagName("persoana");
+					 Element emp = (Element) nList.item(0);
+					 Node name = emp.getElementsByTagName("nume").item(0).getFirstChild();
+					 name.setNodeValue(pacientNameField.getText());
+					 
+					 NodeList nList1 = dom.getElementsByTagName("nume");
+					 Element emp1 = (Element) nList1.item(0);
+					 emp1.setAttribute("nevoie_transfuzie", (String) needBloodTransfusions.getSelectedItem());
+					 emp1.setAttribute("donator", (String) isDonor.getSelectedItem());
+					 
+					 NodeList nList2 = dom.getElementsByTagName("persoana");
+					 Element emp2 = (Element) nList2.item(0);
+					 Node name2 = emp2.getElementsByTagName("grupa_sange").item(0).getFirstChild();
+					 name2.setNodeValue((String) bloodGroup.getSelectedItem());
+					 
+					 NodeList nList3 = dom.getElementsByTagName("persoana");
+					 Element emp3 = (Element) nList3.item(0);
+					 Node name3 = emp3.getElementsByTagName("rh").item(0).getFirstChild();
+					 name3.setNodeValue((String) rhType.getSelectedItem());
+					 
+					 dom.getDocumentElement().normalize();
+					 TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			         Transformer transformer = transformerFactory.newTransformer();
+			         
+			         DOMSource source = new DOMSource(dom);
+			         StreamResult result = new StreamResult(new File(new File(Paths.get("createdpacientFile.xml").toAbsolutePath().toString()).toString()));
+			         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			         transformer.transform(source, result);
+			         
+			         Document doc = db.parse(new File(Paths.get("createdpacientFile.xml").toAbsolutePath().toString()).toString());
+			         
+			         for(int i=0; i<table.getModel().getRowCount(); i++)
+			         {
+			        	 String xml = "<simptom>"+(String) table.getModel().getValueAt(i, 0)+"</simptom>";
+			        	 Document doc20 = db.parse(new ByteArrayInputStream(xml.getBytes()));
+						 Node dup = doc.importNode(doc20.getDocumentElement(), true);
+						 doc.getElementsByTagName("persoana").item(0).appendChild(dup);
+						 
+						 doc.getDocumentElement().normalize();
+						 TransformerFactory transformerFactory11 = TransformerFactory.newInstance();
+				         Transformer transformer11 = transformerFactory11.newTransformer();
+				         
+				         DOMSource source11 = new DOMSource(doc);
+				         StreamResult result11 = new StreamResult(new File(new File(Paths.get("createdpacientFile.xml").toAbsolutePath().toString()).toString()));
+				         transformer11.setOutputProperty(OutputKeys.INDENT, "yes");
+				         transformer11.transform(source11, result11);
+			         }
+			         
+		        	 NodeList nList4 = doc.getElementsByTagName("persoana");
+					 Element emp4 = (Element) nList4.item(0);
+					 Node node4 = originaldom.importNode(emp4, true);
+					 originaldom.getElementsByTagName("pacienti").item(0).appendChild(node4);
+					 
+					 originaldom.getDocumentElement().normalize();
+					 TransformerFactory transformerFactory11 = TransformerFactory.newInstance();
+			         Transformer transformer11 = transformerFactory11.newTransformer();
+			         
+			         DOMSource source11 = new DOMSource(originaldom);
+			         StreamResult result11 = new StreamResult(new File(new File(Paths.get("sistem_expert.xml").toAbsolutePath().toString()).toString()));
+			         transformer11.setOutputProperty(OutputKeys.INDENT, "yes");
+			         transformer11.transform(source11, result11);
+			         
+			         br = new BufferedReader(new FileReader(new File(new File(Paths.get("sistem_expert.xml").toAbsolutePath().toString()).toString())));
+			         String line;
+			         StringBuilder sb = new StringBuilder();
+
+			         while((line=br.readLine())!= null){
+			             sb.append(line.trim());
+			         }
+			         
+			         try 
+			         {
+			        	 JSONObject xmlJSONObj = XML.toJSONObject(sb.toString());
+			        	 String jsonPrettyPrintString = xmlJSONObj.toString(4);
+			        	 PrintWriter writer = new PrintWriter(new File(Paths.get("sistem_expert.json").toAbsolutePath().toString()).toString();  );
+					 	 writer.print("");
+					 	 writer.print(jsonPrettyPrintString);
+					 	 writer.close();
+			         } 
+			         catch (JSONException e1) 
+			         {
+			        	 e1.printStackTrace();
+			         }
+
+			         
+				 }
+				 catch(Exception e2)
+				 {
+					 e2.printStackTrace();
+				 }
+			}
+		});
+		btnNewPacient.setBounds(156, 234, 146, 42);
+		frame.getContentPane().add(btnNewPacient);
+		
+		btnDeleteSymptom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int numRows = table.getSelectedRow();
+				if(numRows != -1) 
+				{
+					model.removeRow(numRows);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Nu a fost selectat niciun rand din tabel","Atentie", JOptionPane.YES_NO_OPTION);
+				}
+			}
+		});
+		btnDeleteSymptom.setBounds(156, 203, 148, 23);
+		frame.getContentPane().add(btnDeleteSymptom);
+		
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	}
+}
+	
+
+

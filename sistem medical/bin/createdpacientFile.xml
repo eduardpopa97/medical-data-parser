@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persoana>		
+	<nume donator="Da" nevoie_transfuzie="Da">Eduard</nume>
+	<grupa_sange>O</grupa_sange>		
+	<rh>pozitiv</rh>
+<simptom>febra</simptom>
+<simptom>durere_cap</simptom>
+<simptom>frisoane</simptom>
+<simptom>gat_umflat</simptom>
+<simptom>nas_infundat</simptom>
+<simptom>tuse</simptom>
+</persoana>

@@ -1,0 +1,196 @@
+package guiJUnitTests;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import gui.Parser;
+
+public class GetDataFromFilesTests {
+	
+	private static Parser parser = new Parser();
+	
+	private List<Object> expectedResultPacients = new ArrayList<Object>();
+	
+	private List<Object> expectedResultDoctors = new ArrayList<Object>();
+	
+	private List<Object> expectedResultDonors = new ArrayList<Object>();
+	
+	private List<Object> expectedResultDiagnostics = new ArrayList<Object>();
+	
+	private List<Object> expectedResultCompatibilities = new ArrayList<Object>();
+	
+	@SuppressWarnings("static-access")
+	@Before
+	public void setup() 
+	{
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Alexandru","sinuzita","AB","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Alexandru","infectie_ureche","AB","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","tuse_sange","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","oboseala","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","pierdere_greutate","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","pierdere_apetit","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","febra","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Catalin","transpiratie_abundenta","O","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Daniela","durere_spate","AB","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Daniela","urina_sange","AB","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Daniela","dureri_stomac","AB","negativ"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Ioana","tuse","A","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Ioana","febra","A","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Ioana","frisoane","A","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Ioana","respiratie_greoaie","A","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Marius","otita","B","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Marius","sinuzita","B","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Marius","bronsita","B","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Marius","anafilaxie_severa","B","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Adrian","bilirubina_crescuta","O","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Adrian","icter","O","pozitiv"}));
+		expectedResultPacients.add(Arrays.toString(new Object[] {"Adrian","litiaza_biliara","O","pozitiv"}));
+		
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Popescu","boli_infectioase"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Zamfir","chirurgie"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Marinescu","imunologie"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Necula","pneumologie"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Ciobanu","nefrologie"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Hristache","gastroenterologie"}));
+		expectedResultDoctors.add(Arrays.toString(new Object[] {"Dr_Rizescu","endocrinologie"}));
+		
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Mihaela","AB","negativ"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Georgiana","O","pozitiv"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Paul","A","pozitiv"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Cristina","B","negativ"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Elena","A","negativ"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Gabriel","AB","pozitiv"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Adelin","O","negativ"}));
+		expectedResultDonors.add(Arrays.toString(new Object[] {"Diana","B","pozitiv"}));
+		
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Alexandru","rinita_alergica"}));
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Catalin","tuberculoza"}));
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Daniela","litiaza_renala"}));
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Ioana","pneumonie"}));
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Marius","deficienta_imunoglobina_A"}));
+		expectedResultDiagnostics.add(Arrays.toString(new Object[] {"Adrian","sindrom_Gilbert"}));
+		
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"O","A"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"O","B"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"O","AB"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"O","O"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"A","A"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"A","AB"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"B","AB"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"B","B"}));
+		expectedResultCompatibilities.add(Arrays.toString(new Object[] {"AB","AB"}));
+		
+		parser.chooser.setSelectedFile(new File(new File(System.getProperty("user.dir")).getParent()+"\\sistem_expert.xml"));
+		parser.btnBrowseXML.doClick();
+		
+		parser.chooser.setSelectedFile(new File(System.getProperty("user.dir")+"\\sistem_expert.json"));
+		parser.btnBrowseJSON.doClick();
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkPacientsListTest()
+	{
+		parser.model.setRowCount(0);
+		parser.btnDisplayPacientsList.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.model.getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.model.getValueAt(i, 0),
+												   parser.model.getValueAt(i, 1),
+												   parser.model.getValueAt(i, 2),
+												   parser.model.getValueAt(i, 3)}));
+		}
+		
+		Assert.assertEquals(expectedResultPacients, test);
+		
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkDoctorsListTest()
+	{
+		parser.model.setRowCount(0);
+		parser.btnDisplayDoctorsList.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.model.getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.model.getValueAt(i, 0),
+												   parser.model.getValueAt(i, 1)}));
+		}
+		
+		Assert.assertEquals(expectedResultDoctors, test);
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkDonorsListTest()
+	{
+		parser.btnDisplayDonorsList.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.table.getModel().getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.table.getModel().getValueAt(i, 0),
+												   parser.table.getModel().getValueAt(i, 1),
+					                               parser.table.getModel().getValueAt(i, 2)}));
+		}
+		
+		Assert.assertEquals(expectedResultDonors, test);
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkDiagnosticsListTest()
+	{
+		parser.btnGetDiagnostics.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.table.getModel().getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.table.getModel().getValueAt(i, 0),
+												   parser.table.getModel().getValueAt(i, 1)}));
+		}
+		
+		Assert.assertEquals(expectedResultDiagnostics, test);
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkPacientsDonorsListTest()
+	{
+		List<Object> expectedResult = new ArrayList<Object>();
+		expectedResult.add(Arrays.toString(new Object[] {"Adelin","O","negativ"}));
+		parser.donorsForPacientField.setText("Catalin");
+		parser.btnSearchDonors.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.table.getModel().getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.table.getModel().getValueAt(i, 0),
+												   parser.table.getModel().getValueAt(i, 1),
+												   parser.table.getModel().getValueAt(i, 2)}));
+		}
+		
+		Assert.assertEquals(expectedResult, test);
+		
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void checkTransfusionsRulesTest()
+	{
+		parser.btnTransfusionsRules.doClick();
+		List<Object> test = new ArrayList<Object>();
+		for(int i=0; i<parser.table.getModel().getRowCount(); i++)
+		{
+			test.add(Arrays.toString(new Object[] {parser.table.getModel().getValueAt(i, 0),
+												   parser.table.getModel().getValueAt(i, 1)}));
+		}
+		
+		Assert.assertEquals(expectedResultCompatibilities, test);
+	}
+}
